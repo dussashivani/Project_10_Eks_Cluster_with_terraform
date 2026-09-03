@@ -27,12 +27,18 @@ pipeline {
 
         stage('CHECK AWS') {
             steps {
-                sh '''
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                    ]) {
+                    sh '''
                     echo "Checking AWS credentials..."
                     aws sts get-caller-identity
-                '''
-            }
+                    '''
         }
+    }
+}
+        
 
         stage('CREATE REMOTE BACKEND') {
             steps {
