@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
-   }
+    }
 
     stages {
 
@@ -30,75 +30,104 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
-                    ]) {
+                ]) {
                     sh '''
-                    echo "Checking AWS credentials..."
-                    aws sts get-caller-identity
+                        echo "Checking AWS credentials..."
+                        aws sts get-caller-identity
                     '''
+                }
+            }
         }
-    }
-}
-        
 
         stage('CREATE REMOTE BACKEND') {
             steps {
-                sh '''
-                    echo "Creating S3 bucket and DynamoDB table..."
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        echo "Creating S3 bucket and DynamoDB table..."
 
-                    cd eks-install/backend
+                        cd eks-install/backend
 
-                    terraform init
-                    terraform validate
-                    terraform plan
-                    terraform apply -auto-approve
-                '''
+                        terraform init
+                        terraform validate
+                        terraform plan
+                        terraform apply -auto-approve
+                    '''
+                }
             }
         }
 
         stage('TERRAFORM INIT') {
             steps {
-                sh '''
-                    echo "Initializing EKS Terraform configuration..."
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        echo "Initializing EKS Terraform configuration..."
 
-                    cd eks-install
-                    terraform init
-                '''
+                        cd eks-install
+                        terraform init
+                    '''
+                }
             }
         }
 
         stage('TERRAFORM VALIDATE') {
             steps {
-                sh '''
-                    cd eks-install
-                    terraform validate
-                '''
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        cd eks-install
+                        terraform validate
+                    '''
+                }
             }
         }
 
         stage('TERRAFORM PLAN') {
             steps {
-                sh '''
-                    cd eks-install
-                    terraform plan -out=tfplan
-                '''
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        cd eks-install
+                        terraform plan -out=tfplan
+                    '''
+                }
             }
         }
 
         stage('TERRAFORM APPLY') {
             steps {
-                sh '''
-                    cd eks-install
-                    terraform apply -auto-approve tfplan
-                '''
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        cd eks-install
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
             }
         }
 
         stage('TERRAFORM OUTPUT') {
             steps {
-                sh '''
-                    cd eks-install
-                    terraform output
-                '''
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        cd eks-install
+                        terraform output
+                    '''
+                }
             }
         }
     }
@@ -117,7 +146,6 @@ pipeline {
         }
     }
 }
-
 
 
 
